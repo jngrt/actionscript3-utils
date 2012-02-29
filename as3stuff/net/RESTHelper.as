@@ -5,8 +5,11 @@
  */
 package as3stuff.net {
 
+import com.demonsters.debugger.MonsterDebugger;
+
 import flash.events.Event;
 import flash.events.ErrorEvent;
+import flash.events.HTTPStatusEvent;
 import flash.events.IOErrorEvent;
 import flash.events.SecurityErrorEvent;
 import flash.net.URLLoader;
@@ -28,17 +31,22 @@ public class RESTHelper {
             req.data = JSON.stringify(data);
         
         var loader:URLLoader = new URLLoader();
-        
+        var statusCode:int;
+
+        loader.addEventListener(HTTPStatusEvent.HTTP_STATUS, function(e:HTTPStatusEvent){
+            statusCode = e.status;
+        });
+
         if(onSuccess)
             loader.addEventListener(Event.COMPLETE,function(e:Event){
-                onSuccess(JSON.parse((e.target as URLLoader).data));
+                onSuccess({code:statusCode, data:JSON.parse((e.target as URLLoader).data)});
             });
         if(onError){
             loader.addEventListener(IOErrorEvent.IO_ERROR,function(e:ErrorEvent){
-                onError(e.text);
+                onError({code:statusCode, message:e.text});
             });
             loader.addEventListener(SecurityErrorEvent.SECURITY_ERROR, function(e:ErrorEvent){
-                onError(e.text);
+                onError({code:statusCode, message:e.text});
             });
         }
         loader.load(req);   
