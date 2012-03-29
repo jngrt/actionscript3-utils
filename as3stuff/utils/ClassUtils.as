@@ -12,7 +12,10 @@ public class ClassUtils {
 
     public static function getClassName(object:*):String {
         var className:String = getQualifiedClassName(object);
-        return className.slice(className.lastIndexOf("::") + 2);
+        if( className.lastIndexOf("::")>-1)
+            className = className.slice(className.lastIndexOf("::") + 2);
+
+        return className;
     }
 }
 }
